@@ -62,6 +62,7 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\Test.cs" />
     <None Include="Assets\Shaders\RimLighting.shader" />
+    <None Include="Assets\Shaders\ForwardRender.shader" />
     <None Include="Assets\Shaders\Trans.shader" />
     <Reference Include="Unity.TextMeshPro.Editor">
       <HintPath>C:/Users/wangshihao/Documents/Unity/LearnUnity/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
