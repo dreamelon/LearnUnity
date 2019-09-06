@@ -139,7 +139,7 @@ Light:
   m_Enabled: 1
   serializedVersion: 8
   m_Type: 1
-  m_Color: {r: 0.21498193, g: 0.9150943, b: 0.15970986, a: 1}
+  m_Color: {r: 0.3454645, g: 0.9137255, b: 0.16078432, a: 1}
   m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
@@ -329,7 +329,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 4294967295
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -473,7 +473,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 30c76acc6d5f103448350985c2574959, type: 2}
+  - {fileID: 2100000, guid: d1f6163b6e736e849876aa51521163aa, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -509,7 +509,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 827600106}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 7.96, y: -1.9494766, z: -5.583886}
+  m_LocalPosition: {x: 2.35, y: -1.9494766, z: -11.23}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -733,6 +733,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: dragon
       objectReference: {fileID: 0}
+    - target: {fileID: 2300000, guid: 5e8162bba2b927c478a406f9c03c4ed9, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 30c76acc6d5f103448350985c2574959, type: 2}
     - target: {fileID: 400002, guid: 5e8162bba2b927c478a406f9c03c4ed9, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0
@@ -789,9 +793,5 @@ PrefabInstance:
       propertyPath: m_LocalScale.z
       value: 0.3
       objectReference: {fileID: 0}
-    - target: {fileID: 2300000, guid: 5e8162bba2b927c478a406f9c03c4ed9, type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: 30c76acc6d5f103448350985c2574959, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5e8162bba2b927c478a406f9c03c4ed9, type: 3}

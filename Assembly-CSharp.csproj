@@ -63,6 +63,7 @@
     <Compile Include="Assets\Scripts\SkyBox.cs" />
     <Compile Include="Assets\Scripts\SRPCamera.cs" />
     <Compile Include="Assets\Scripts\Test.cs" />
+    <None Include="Assets\Shaders\Shadow.shader" />
     <None Include="Assets\Shaders\RimLighting.shader" />
     <None Include="Assets\Shaders\SkyBox.shader" />
     <None Include="Assets\Shaders\ForwardRender.shader" />
