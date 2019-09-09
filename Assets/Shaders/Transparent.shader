@@ -1,4 +1,4 @@
-﻿Shader "Custom/Trans"
+﻿Shader "Custom/Transparent"
 {
     Properties
     {

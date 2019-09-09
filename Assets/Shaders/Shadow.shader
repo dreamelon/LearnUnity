@@ -9,10 +9,8 @@
     SubShader
     {
         Tags { "RenderType"="Opaque" }
-        LOD 100
 
-        Pass
-             {
+        Pass{
 			Tags {"LightMode" = "ForwardBase"}
             CGPROGRAM
 			#pragma multi_compile_fwdbase
