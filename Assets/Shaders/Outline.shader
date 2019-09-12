@@ -12,7 +12,8 @@
         Tags {"Queue" = "Transparent"}
         Pass
         {
-			ZWRITE Off
+			//Offset -1, -1
+			//ZWrite Off
 			CULL Front
             CGPROGRAM
             #pragma vertex vert
