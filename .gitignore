@@ -50,7 +50,6 @@ artifacts/
 *_i.h
 *.ilk
 *.meta
-*.obj
 *.pch
 *.pdb
 *.pgc
@@ -261,3 +260,39 @@ __pycache__/
 *.pyc
 /Temp
 /Library
+
+# ---------------[ Unity generated ]------------------ #
+
+/Temp
+
+/obj
+
+/UnityGenerated
+
+/Library
+
+ 
+
+# ----[ Visual Studio / MonoDevelop generated ]------- #
+
+ 
+
+ExportedObj/
+
+*.svd
+
+*.userprefs
+
+*.csproj
+
+*.pidb
+
+*.suo
+
+*.sln
+
+*.user
+
+*.unityproj
+
+*.booproj
