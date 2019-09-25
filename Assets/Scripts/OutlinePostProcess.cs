@@ -1,120 +1,135 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-//非运行时也有效果
-[ExecuteInEditMode]
-public class OutlinePostProcess : MonoBehaviour
+
+public class OutlinePostProcess : PostProcess
 {
-    public Camera outlineCamera;
+    private Camera mainCam = null;
+    private Camera additionalCam = null;
+    private RenderTexture renderTexture = null;
 
-    #region 纯色材质
-    public Shader pureColorShader;
-    private Material m_pureColor = null;
-    private Material pureMat
-    {
-        get
-        {
-            if (m_pureColor == null)
-                m_pureColor = new Material(pureColorShader);
-            return m_pureColor;
-        }
-    }
-    #endregion
+    public Shader outlineShader = null;
 
-    #region 合并材质
-    public Shader compositeShader;
-    private Material m_composite = null;
-    private Material compositeMat
-    {
-        get
-        {
-            if (m_composite == null)
-                m_composite = new Material(compositeShader);
-            return m_composite;
-        }
-    }
-    #endregion
-
-    #region 剔除材质
-    public Shader cutoffShader;
-    private Material m_cutoff = null;
-    private Material cutoffMat
-    {
-        get
-        {
-            if (m_cutoff == null)
-                m_cutoff = new Material(compositeShader);
-            return m_cutoff;
-        }
-    }
-    #endregion
-
-    #region 模糊材质
-    public Shader blurShader;
-    private Material m_blur = null;
-    private Material blurMat
-    {
-        get
-        {
-            if (m_blur == null)
-                m_blur = new Material(blurShader);
-            return m_blur;
-        }
-    }
-    #endregion
-
-    private RenderTexture outlineRT;
-
+    //采样率  
+    public float samplerScale = 1;
+    public int downSample = 1;
     public int iterations = 2;
-    private void OnPreRender() 
+
+    private void Awake()
     {
-        outlineCamera.targetTexture = outlineRT;
-        outlineCamera.RenderWithShader(pureColorShader, "");
+        InitAdditionalCam();
     }
+
+    private void InitAdditionalCam()
+    {
+        mainCam = this.GetComponent<Camera>();
+        if (mainCam == null)
+            return;
+
+        Transform addCamTransform = transform.Find("additionalCam");
+        if (addCamTransform != null)
+            DestroyImmediate(addCamTransform.gameObject);
+
+        GameObject additionalCamObj = new GameObject("additionalCam");
+        additionalCam = additionalCamObj.AddComponent<Camera>();
+
+        SetAdditionalCam();
+    }
+
+    private void SetAdditionalCam()
+    {
+        if (additionalCam)
+        {
+            additionalCam.transform.parent = mainCam.transform;
+            additionalCam.transform.localPosition = Vector3.zero;
+            additionalCam.transform.localRotation = Quaternion.identity;
+            additionalCam.transform.localScale = Vector3.one;
+            additionalCam.farClipPlane = mainCam.farClipPlane;
+            additionalCam.nearClipPlane = mainCam.nearClipPlane;
+            additionalCam.fieldOfView = mainCam.fieldOfView;
+            additionalCam.backgroundColor = Color.clear;
+            additionalCam.clearFlags = CameraClearFlags.Color;
+            additionalCam.cullingMask = 1 << LayerMask.NameToLayer("dragon");
+            additionalCam.depth = -999;
+            if (renderTexture == null)
+                renderTexture = RenderTexture.GetTemporary(additionalCam.pixelWidth >> downSample, additionalCam.pixelHeight >> downSample, 0);
+        }
+    }
+
+    private void OnEnable()
+    {
+        SetAdditionalCam();
+        additionalCam.enabled = true;
+    }
+
+    private void OnDisable()
+    {
+        additionalCam.enabled = false;
+    }
+
+    private void OnDestroy()
+    {
+        if (renderTexture)
+        {
+            RenderTexture.ReleaseTemporary(renderTexture);
+        }
+        DestroyImmediate(additionalCam.gameObject);
+    }
+
+    private void OnPreRender()
+    {
+        if (additionalCam.enabled)
+        {
+            if (renderTexture != null && (renderTexture.width != Screen.width >> downSample || renderTexture.height != Screen.height >> downSample))
+            {
+                RenderTexture.ReleaseTemporary(renderTexture);
+                renderTexture = RenderTexture.GetTemporary(Screen.width >> downSample, Screen.height >> downSample, 0);
+            }
+            additionalCam.targetTexture = renderTexture;
+            additionalCam.RenderWithShader(outlineShader, "");
+        }
+    }
+
     private void OnRenderImage(RenderTexture source, RenderTexture destination)
     {
-        RenderTexture _renderTexture = RenderTexture.GetTemporary(outlineRT.width, outlineRT.height);
-
-        MixRender(outlineRT, ref _renderTexture);
-
-        Graphics.Blit(_renderTexture, destination, compositeMat);
-        RenderTexture.ReleaseTemporary(_renderTexture);
-    }
-    private void Start()
-    {
-        outlineRT = new RenderTexture((int)outlineCamera.pixelWidth, (int)outlineCamera.pixelHeight, 16);
-    }
-
-    void MixRender(RenderTexture in_outerTexture, ref RenderTexture _renderTexture)
-    {
-        RenderTexture buffer1 = RenderTexture.GetTemporary(in_outerTexture.width, in_outerTexture.height, 0);
-        RenderTexture buffer2 = RenderTexture.GetTemporary(in_outerTexture.width, in_outerTexture.height, 0);
-        //用buffer1接收纹理
-        Graphics.Blit(in_outerTexture, buffer1);
-
-        //多次模糊
-        for(int i=0; i<iterations; i++)
+        if(_Material && renderTexture)
         {
-            //用buffer2接受buffer1使用blurMat模糊过的纹理
-            FourTapCone(buffer1, buffer2, i);
-            //又传递给buffer1多次模糊
-            Graphics.Blit(buffer2, buffer1);
-        }
-        //将buffer1与初始纹理比较，剔除，得到轮廓
-        Graphics.Blit(in_outerTexture, buffer1, cutoffMat);
-        Graphics.Blit(buffer1, _renderTexture);
+            RenderTexture temp1 = RenderTexture.GetTemporary(source.width >> downSample, source.height >> downSample, 0);
+            RenderTexture temp2 = RenderTexture.GetTemporary(source.width >> downSample, source.height >> downSample, 0);
 
-        RenderTexture.ReleaseTemporary(buffer1);
-        RenderTexture.ReleaseTemporary(buffer2);
+            Graphics.Blit(renderTexture, temp1);
+
+            for(int i=0; i<iterations; i++)
+            {
+                _Material.SetVector("_offset", new Vector4(0, samplerScale, 0, 0));
+                Graphics.Blit(temp1, temp2, _Material, 0);         
+                _Material.SetVector("_offset", new Vector4(samplerScale, 0, 0, 0));
+                Graphics.Blit(temp2, temp1, _Material, 0);
+            }
+
+            _Material.SetTexture("_BLurTex", temp2);
+            Graphics.Blit(renderTexture, temp1, _Material, 1);
+
+            _Material.SetTexture("_BlurTex", temp1);
+            Graphics.Blit(renderTexture, destination, _Material, 2);
+
+            RenderTexture.ReleaseTemporary(temp1);
+            RenderTexture.ReleaseTemporary(temp2);
+        }
+        else
+        {
+            Graphics.Blit(source, destination);
+        }
     }
-    float Speed = 0.8f;
-    public void FourTapCone(RenderTexture source, RenderTexture dest, int iteration)
+    // Start is called before the first frame update
+    void Start()
     {
-        float off = 0.5f + iteration * Speed;
-        Graphics.BlitMultiTap(source, dest, blurMat,
-            new Vector2(off, off),
-            new Vector2(-off, off),
-            new Vector2(off, -off),
-            new Vector2(-off, -off));
+        
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
     }
 }

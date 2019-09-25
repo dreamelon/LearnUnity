@@ -13,7 +13,7 @@
         Pass
         {
 			//Offset -1, -1
-			//ZWrite Off
+			ZWrite Off
 			CULL Front
             CGPROGRAM
             #pragma vertex vert
@@ -41,8 +41,8 @@
                 o.vertex = UnityObjectToClipPos(v.vertex);
 				float3 vnormal = mul((float3x3)UNITY_MATRIX_IT_MV, v.normal);
 				float2 pnormal_xy = mul((float2x2)UNITY_MATRIX_P, vnormal.xy);
-				//o.vertex.xy += pnormal_xy * _OutlineIntensity;
-				o.vertex.xy += pnormal_xy * o.vertex.z * _OutlineIntensity;
+				o.vertex.xy += pnormal_xy * _OutlineIntensity;
+				//o.vertex.xy += pnormal_xy * o.vertex.z * _OutlineIntensity;
                 return o;
             }
 

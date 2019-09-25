@@ -9,7 +9,7 @@ using UnityEngine;
 public class PostProcess : MonoBehaviour
 {
     public Shader shader = null;
-    public Material _material = null;
+    private Material _material = null;
     public Material _Material
     {
         get
@@ -31,16 +31,5 @@ public class PostProcess : MonoBehaviour
         if (material)
             return material;
         return material;  
-    }
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

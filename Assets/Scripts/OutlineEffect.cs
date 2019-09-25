@@ -1,105 +1,129 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-public class OutlineEffect : PostProcess
+//非运行时也有效果
+[ExecuteInEditMode]
+public class OutlineEffect : MonoBehaviour
 {
-    private Camera mainCam = null;
-    private Camera additionalCam = null;
-    private RenderTexture renderTexture = null;
+    public Camera outlineCamera;
 
-    public Shader outlineShader = null;
-
-    //采样率  
-    public float samplerScale = 1;
-    public int downSample = 1;
-    public int iteration = 2;
-
-    private void Awake()
+    #region 纯色材质
+    public Shader pureColorShader;
+    private Material m_pureColor = null;
+    private Material pureMat
     {
-        InitAdditionalCam();
-    }
-
-
-
-    private void InitAdditionalCam()
-    {
-        mainCam = this.GetComponent<Camera>();
-        if (mainCam == null)
-            return;
-
-        Transform addCamTransform = transform.Find("additionalCam");
-        if (addCamTransform != null)
-            DestroyImmediate(addCamTransform.gameObject);
-
-        GameObject additionalCamObj = new GameObject("additionalCam");
-        additionalCam = additionalCamObj.AddComponent<Camera>();
-
-        SetAdditionalCam();
-    }
-
-    private void SetAdditionalCam()
-    {
-        if (additionalCam)
+        get
         {
-            additionalCam.transform.parent = mainCam.transform;
-            additionalCam.transform.localPosition = Vector3.zero;
-            additionalCam.transform.localRotation = Quaternion.identity;
-            additionalCam.transform.localScale = Vector3.one;
-            additionalCam.farClipPlane = mainCam.farClipPlane;
-            additionalCam.nearClipPlane = mainCam.nearClipPlane;
-            additionalCam.fieldOfView = mainCam.fieldOfView;
-            additionalCam.backgroundColor = Color.clear;
-            additionalCam.clearFlags = CameraClearFlags.Color;
-            additionalCam.cullingMask = 1 << LayerMask.NameToLayer("dragon");
-            additionalCam.depth = -999;
-            if (renderTexture == null)
-                renderTexture = RenderTexture.GetTemporary(additionalCam.pixelWidth >> downSample, additionalCam.pixelHeight >> downSample, 0);
+            if (m_pureColor == null)
+                m_pureColor = new Material(pureColorShader);
+            return m_pureColor;
         }
     }
+    #endregion
 
-    private void OnEnable()
+    #region 合并材质
+    public Shader compositeShader;
+    private Material m_composite = null;
+    private Material compositeMat
     {
-        SetAdditionalCam();
-        additionalCam.enabled = true;
+        get
+        {
+            if (m_composite == null)
+                m_composite = new Material(compositeShader);
+            return m_composite;
+        }
+    }
+    #endregion
+
+    #region 剔除材质
+    public Shader cutoffShader;
+    private Material m_cutoff = null;
+    private Material cutoffMat
+    {
+        get
+        {
+            if (m_cutoff == null)
+                m_cutoff = new Material(compositeShader);
+            return m_cutoff;
+        }
+    }
+    #endregion
+
+    #region 模糊材质
+    public Shader blurShader;
+    private Material m_blur = null;
+    private Material blurMat
+    {
+        get
+        {
+            if (m_blur == null)
+                m_blur = new Material(blurShader);
+            return m_blur;
+        }
+    }
+    #endregion
+
+    private RenderTexture outlineRT;
+
+    public int iterations = 2;
+
+    private void Start()
+    {
+        outlineRT = new RenderTexture((int)outlineCamera.pixelWidth, (int)outlineCamera.pixelHeight, 16);
     }
 
-    private void OnDisable()
+    private void OnPreRender() 
     {
-        additionalCam.enabled = false;
+        outlineCamera.targetTexture = outlineRT;
+        outlineCamera.RenderWithShader(pureColorShader, "");
+    }
+
+    private void OnRenderImage(RenderTexture source, RenderTexture destination)
+    {
+        RenderTexture _renderTexture = RenderTexture.GetTemporary(outlineRT.width, outlineRT.height);
+
+        MixRender(outlineRT, ref _renderTexture);
+
+        Graphics.Blit(_renderTexture, destination, compositeMat);
+        RenderTexture.ReleaseTemporary(_renderTexture);
+    }
+
+    void MixRender(RenderTexture in_outerTexture, ref RenderTexture _renderTexture)
+    {
+        RenderTexture temp1 = RenderTexture.GetTemporary(in_outerTexture.width, in_outerTexture.height, 0);
+        RenderTexture temp2 = RenderTexture.GetTemporary(in_outerTexture.width, in_outerTexture.height, 0);
+        //用buffer1接收纹理
+        Graphics.Blit(in_outerTexture, temp1);
+
+        //多次模糊
+        for(int i=0; i<iterations; i++)
+        {
+            //用buffer2接受buffer1使用blurMat模糊过的纹理
+            FourTapCone(temp1, temp2, i);
+            //又传递给buffer1多次模糊
+            Graphics.Blit(temp2, temp1);
+        }
+        //将buffer1与初始纹理比较，剔除，得到轮廓
+        Graphics.Blit(in_outerTexture, temp1, cutoffMat);
+        Graphics.Blit(temp1, _renderTexture);
+
+        RenderTexture.ReleaseTemporary(temp1);
+        RenderTexture.ReleaseTemporary(temp2);
+    }
+
+    float Speed = 0.8f;
+    public void FourTapCone(RenderTexture source, RenderTexture dest, int iteration)
+    {
+        float off = 0.5f + iteration * Speed;
+        Graphics.BlitMultiTap(source, dest, blurMat,
+            new Vector2(off, off),
+            new Vector2(-off, off),
+            new Vector2(off, -off),
+            new Vector2(-off, -off));
     }
 
     private void OnDestroy()
     {
-        if (renderTexture)
-        {
-            RenderTexture.ReleaseTemporary(renderTexture);
-        }
-        DestroyImmediate(additionalCam.gameObject);
-    }
 
-    private void OnPreRender()
-    {
-        if (additionalCam.enabled)
-        {
-            if (renderTexture != null && (renderTexture.width != Screen.width >> downSample || renderTexture.height != Screen.height >> downSample))
-            {
-                RenderTexture.ReleaseTemporary(renderTexture);
-                renderTexture = RenderTexture.GetTemporary(Screen.width >> downSample, Screen.height >> downSample, 0);
-                additionalCam.targetTexture = renderTexture;
-                additionalCam.RenderWithShader(outlineShader, "");
-            }
-        }
-    }
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }
