@@ -14,6 +14,7 @@ public class OutlinePostProcess : PostProcess
     public float samplerScale = 1;
     public int downSample = 1;
     public int iterations = 2;
+    public Color outlineColor = Color.green;
 
     private void Awake()
     {
@@ -96,22 +97,21 @@ public class OutlinePostProcess : PostProcess
         {
             RenderTexture temp1 = RenderTexture.GetTemporary(source.width >> downSample, source.height >> downSample, 0);
             RenderTexture temp2 = RenderTexture.GetTemporary(source.width >> downSample, source.height >> downSample, 0);
-
+            //_Material.SetTexture("_MainTex", renderTexture);
             Graphics.Blit(renderTexture, temp1);
-
+            
             for(int i=0; i<iterations; i++)
             {
-                _Material.SetVector("_offset", new Vector4(0, samplerScale, 0, 0));
+                _Material.SetFloat("_BlurSize", 1.2f);
                 Graphics.Blit(temp1, temp2, _Material, 0);         
-                _Material.SetVector("_offset", new Vector4(samplerScale, 0, 0, 0));
-                Graphics.Blit(temp2, temp1, _Material, 0);
+               
+                Graphics.Blit(temp2, temp1, _Material, 1);
             }
 
             _Material.SetTexture("_BLurTex", temp2);
-            Graphics.Blit(renderTexture, temp1, _Material, 1);
-
-            _Material.SetTexture("_BlurTex", temp1);
-            Graphics.Blit(renderTexture, destination, _Material, 2);
+            _Material.SetTexture("_SrcTex", renderTexture);
+            _Material.SetColor("_OutlineColor", outlineColor);
+            Graphics.Blit(temp2, destination);
 
             RenderTexture.ReleaseTemporary(temp1);
             RenderTexture.ReleaseTemporary(temp2);

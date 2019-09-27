@@ -84,7 +84,7 @@ public class OutlineEffect : MonoBehaviour
 
         MixRender(outlineRT, ref _renderTexture);
 
-        Graphics.Blit(_renderTexture, destination, compositeMat);
+        Graphics.Blit(_renderTexture, destination);
         RenderTexture.ReleaseTemporary(_renderTexture);
     }
 
@@ -104,7 +104,7 @@ public class OutlineEffect : MonoBehaviour
             Graphics.Blit(temp2, temp1);
         }
         //将buffer1与初始纹理比较，剔除，得到轮廓
-        Graphics.Blit(in_outerTexture, temp1, cutoffMat);
+        Graphics.Blit(in_outerTexture, temp1);
         Graphics.Blit(temp1, _renderTexture);
 
         RenderTexture.ReleaseTemporary(temp1);
@@ -115,6 +115,7 @@ public class OutlineEffect : MonoBehaviour
     public void FourTapCone(RenderTexture source, RenderTexture dest, int iteration)
     {
         float off = 0.5f + iteration * Speed;
+        
         Graphics.BlitMultiTap(source, dest, blurMat,
             new Vector2(off, off),
             new Vector2(-off, off),

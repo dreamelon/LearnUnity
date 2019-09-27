@@ -26,10 +26,12 @@ public class PostProcess : MonoBehaviour
             return null;
         if (!shader.isSupported)
             return null;
-        Material material = new Material(shader);
-        material.hideFlags = HideFlags.DontSave;
+        Material material = new Material(shader)
+        {
+            hideFlags = HideFlags.DontSave
+        };
         if (material)
             return material;
-        return material;  
+        return null; 
     }
 }
