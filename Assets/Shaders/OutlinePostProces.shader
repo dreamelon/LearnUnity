@@ -57,6 +57,7 @@
 			half2 uv = v.texcoord;
 
 			//高斯模糊
+			o.uv[0] = uv;
 			o.uv[1] = uv + float2(0.0, _MainTex_ST.y * 1.0) * _BlurSize;
 			o.uv[2] = uv - float2(0.0, _MainTex_ST.y * 1.0) * _BlurSize;
 			o.uv[3] = uv + float2(0.0, _MainTex_ST.y * 2.0) * _BlurSize;
@@ -81,8 +82,7 @@
 
 		fixed4 frag_blur(v2f_Blur i) : SV_Target
 		{
-			fixed4 color = fixed4(0, 0, 0, 0);
-			float weight[3] = { 0.4026, 0.2442, 0.0545 };
+			float weight[3] = { 0.4026 * 3, 0.2442 * 3, 0.0545 * 3};
 
 			fixed3 sum = tex2D(_MainTex, i.uv[0]).rgb * weight[0];
 
@@ -110,9 +110,13 @@
 			fixed4 colorMain = tex2D(_MainTex, i.uv);
 			fixed4 colorBlur = tex2D(_BlurTex, i.uv);
 			fixed4 colorSrc = tex2D(_SrcTex, i.uv);
-			return  colorBlur;
+			return  colorBlur - colorSrc ;
 		}
 		ENDCG
+
+		ZTest Always
+		Cull Off
+		ZWrite Off
 
         Pass
         {
@@ -127,9 +131,7 @@
 
 		Pass
 		{
-			ZTest Off
-			Cull Off
-			ZWrite Off
+
 			CGPROGRAM
 			#pragma vertex vertBlurVertical
 			#pragma fragment frag_blur
@@ -138,9 +140,6 @@
 
 		
 		Pass{
-			ZTest Off
-			Cull Off
-			ZWrite Off
 			CGPROGRAM
 			#pragma vertex vert_add
 			#pragma fragment frag_add
