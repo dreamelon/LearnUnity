@@ -2,18 +2,16 @@
 {
     Properties
     {
-        _MainTex ("Texture", 2D) = "white" {}
+		_MainTex("MainTex", 2D) = "white" {}
     }
     SubShader
     {
-        Tags { "RenderType"="Opaque" }
-        LOD 100
-
         Pass
         {
-			Blend SrcAlpha OneMinusSrcAlpha
+			//不知道为什么不能用混合的方式，，，
+			//Blend One One
 			Cull Off
-			ZWrite Off
+			//ZWrite Off
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
@@ -33,21 +31,21 @@
             };
 
             sampler2D _MainTex;
-            float4 _MainTex_ST;
+			sampler2D _OutlineTex;
 
-            v2f vert (appdata v)
+            v2f vert (appdata_img v)
             {
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
-                o.uv = TRANSFORM_TEX(v.uv, _MainTex);
+                o.uv = v.texcoord.xy;
                 return o;
             }
 
-            fixed4 frag (v2f i) : SV_Target
+            fixed4 frag (v2f i) : COLOR
             {
-                // sample the texture
-                fixed4 col = tex2D(_MainTex, i.uv);
-                return col;
+                fixed4 col = tex2D(_OutlineTex, i.uv);
+				fixed4 main = tex2D(_MainTex, i.uv);
+				return main + col;
             }
             ENDCG
         }

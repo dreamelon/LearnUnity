@@ -2,7 +2,8 @@
 {
     Properties
     {
-        _MainTex ("Texture", 2D) = "white" {}
+        _MainTex ("MainTex", 2D) = "white" {}
+		//_BlurTex ("BlurTex", 2D) = "white" {}
     }
     SubShader
     {
@@ -11,14 +12,14 @@
 
         Pass
         {
-			BlendOp RevSub
+			
+			BlendOp RevSub //dst -src  dst是模糊过的纹理
 			Blend One One
 			Cull Off
 			ZWrite Off
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
-
 
             #include "UnityCG.cginc"
 
@@ -34,14 +35,14 @@
                 float4 vertex : SV_POSITION;
             };
 
-            sampler2D _MainTex;
-            float4 _MainTex_ST;
+            //sampler2D _BlurTex;
+			sampler2D _MainTex;
 
             v2f vert (appdata v)
             {
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
-                o.uv = TRANSFORM_TEX(v.uv, _MainTex);
+				o.uv = v.uv;
                 return o;
             }
 

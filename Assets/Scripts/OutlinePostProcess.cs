@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class OutlinePostProcess : PostProcess
 {
@@ -10,15 +11,18 @@ public class OutlinePostProcess : PostProcess
 
     public Shader outlineShader = null;
 
-    //采样率  
-    public float samplerScale = 1;
+    //采样纹理压缩大小
+    [Range(1, 8)]
     public int downSample = 1;
+    //迭代次数
+    [Range(0, 4)]
     public int iterations = 3;
     public Color outlineColor = Color.green;
 
     private void Awake()
     {
         InitAdditionalCam();
+      
     }
 
     private void InitAdditionalCam()
@@ -79,6 +83,7 @@ public class OutlinePostProcess : PostProcess
 
     private void OnPreRender()
     {
+        
         if (additionalCam.enabled)
         {
             if (renderTexture != null && (renderTexture.width != Screen.width >> downSample || renderTexture.height != Screen.height >> downSample))
@@ -86,28 +91,36 @@ public class OutlinePostProcess : PostProcess
                 RenderTexture.ReleaseTemporary(renderTexture);
                 renderTexture = RenderTexture.GetTemporary(Screen.width >> downSample, Screen.height >> downSample, 0);
             }
+            
             additionalCam.targetTexture = renderTexture;
             additionalCam.RenderWithShader(outlineShader, "");
         }
+
+        //commandBuffer实现待做
+        //CommandBuffer commandBuffer = new CommandBuffer();
+        //commandBuffer.SetRenderTarget(renderTexture);
+        //commandBuffer.ClearRenderTarget(true, true, Color.black);
+
     }
 
     private void OnRenderImage(RenderTexture source, RenderTexture destination)
     {
+
         if(_Material && renderTexture)
         {
             RenderTexture temp1 = RenderTexture.GetTemporary(source.width >> downSample, source.height >> downSample, 0);
             RenderTexture temp2 = RenderTexture.GetTemporary(source.width >> downSample, source.height >> downSample, 0);
-            
+
             //_Material.SetTexture("_MainTex", renderTexture);
             Graphics.Blit(renderTexture, temp1);
 
-            //for (int i = 0; i < iterations; i++)
-            //{
+            for (int i = 0; i < iterations; i++)
+            {
                 _Material.SetFloat("_BlurSize", 1.0f);
                 Graphics.Blit(temp1, temp2, _Material, 0);
 
                 Graphics.Blit(temp2, temp1, _Material, 1);
-            //}
+            }
 
             _Material.SetTexture("_BlurTex", temp1);
             _Material.SetTexture("_SrcTex", renderTexture);

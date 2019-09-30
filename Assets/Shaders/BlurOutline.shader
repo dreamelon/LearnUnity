@@ -25,14 +25,14 @@
             };
 
             sampler2D _MainTex;
-            float4 _MainTex_ST;
+			float4 _MainTex_TexelSize;
 			float4 _BlurOffset;
 
             v2f vert (appdata_img v)
             {
                 v2f o;
-				float offx = _MainTex_ST * _BlurOffset.x;
-				float offy = _MainTex_ST * _BlurOffset.y;
+				float offx = _MainTex_TexelSize * _BlurOffset.x;
+				float offy = _MainTex_TexelSize * _BlurOffset.y;
 
                 o.vertex = UnityObjectToClipPos(v.vertex);
 				float2 uv = MultiplyUV(UNITY_MATRIX_TEXTURE0, v.texcoord.xy - float2(offx, offy));

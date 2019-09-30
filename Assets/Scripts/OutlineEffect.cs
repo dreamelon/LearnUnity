@@ -10,7 +10,7 @@ public class OutlineEffect : MonoBehaviour
     #region 纯色材质
     public Shader pureColorShader;
     private Material m_pureColor = null;
-    private Material pureMat
+    private Material PureMat
     {
         get
         {
@@ -24,7 +24,7 @@ public class OutlineEffect : MonoBehaviour
     #region 合并材质
     public Shader compositeShader;
     private Material m_composite = null;
-    private Material compositeMat
+    private Material CompositeMat
     {
         get
         {
@@ -38,12 +38,12 @@ public class OutlineEffect : MonoBehaviour
     #region 剔除材质
     public Shader cutoffShader;
     private Material m_cutoff = null;
-    private Material cutoffMat
+    private Material CutoffMat
     {
         get
         {
             if (m_cutoff == null)
-                m_cutoff = new Material(compositeShader);
+                m_cutoff = new Material(cutoffShader);
             return m_cutoff;
         }
     }
@@ -52,7 +52,7 @@ public class OutlineEffect : MonoBehaviour
     #region 模糊材质
     public Shader blurShader;
     private Material m_blur = null;
-    private Material blurMat
+    private Material BlurMat
     {
         get
         {
@@ -65,6 +65,7 @@ public class OutlineEffect : MonoBehaviour
 
     private RenderTexture outlineRT;
 
+    [Range(0,4)]
     public int iterations = 2;
 
     private void Start()
@@ -81,10 +82,16 @@ public class OutlineEffect : MonoBehaviour
     private void OnRenderImage(RenderTexture source, RenderTexture destination)
     {
         RenderTexture _renderTexture = RenderTexture.GetTemporary(outlineRT.width, outlineRT.height);
+        RenderTexture temp = RenderTexture.GetTemporary(outlineRT.width, outlineRT.height);
 
         MixRender(outlineRT, ref _renderTexture);
 
-        Graphics.Blit(_renderTexture, destination);
+        //GL.Clear(true, true, Color.grey);
+        CompositeMat.SetTexture("_OutlineTex", _renderTexture);
+        Graphics.Blit(_renderTexture, temp);
+        
+        Graphics.Blit(source, destination, CompositeMat);
+        
         RenderTexture.ReleaseTemporary(_renderTexture);
     }
 
@@ -98,14 +105,16 @@ public class OutlineEffect : MonoBehaviour
         //多次模糊
         for(int i=0; i<iterations; i++)
         {
-            //用buffer2接受buffer1使用blurMat模糊过的纹理
-            FourTapCone(temp1, temp2, i);
-            //又传递给buffer1多次模糊
+            //用temp2接受temp1使用blurMat模糊过的纹理
+            FourTapCone(temp1, temp2 ,i);
+            //又传递给temp1
             Graphics.Blit(temp2, temp1);
         }
         //将buffer1与初始纹理比较，剔除，得到轮廓
-        Graphics.Blit(in_outerTexture, temp1);
-        Graphics.Blit(temp1, _renderTexture);
+        //cutoffMat.SetTexture("_BlurTex", temp1);
+        Graphics.Blit(in_outerTexture, temp2, CutoffMat);
+        Graphics.Blit(temp2, _renderTexture);
+        
 
         RenderTexture.ReleaseTemporary(temp1);
         RenderTexture.ReleaseTemporary(temp2);
@@ -115,8 +124,8 @@ public class OutlineEffect : MonoBehaviour
     public void FourTapCone(RenderTexture source, RenderTexture dest, int iteration)
     {
         float off = 0.5f + iteration * Speed;
-        
-        Graphics.BlitMultiTap(source, dest, blurMat,
+        BlurMat.SetVector("_BlurOffset", new Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+        Graphics.BlitMultiTap(source, dest, BlurMat,
             new Vector2(off, off),
             new Vector2(-off, off),
             new Vector2(off, -off),
