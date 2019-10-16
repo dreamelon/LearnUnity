@@ -10,7 +10,7 @@
     }
     SubShader
     {
-        Tags { "RenderType"="Transparent"  "Queue" = "Transparent" "IgnoreProjection" = "True"}
+        Tags { "RenderType"="Transparent"  "Queue" = "Transparent" "IgnoreProjector" = "True"}
         LOD 100
 
         Pass
