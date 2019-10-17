@@ -9,7 +9,7 @@ public class ProceduralTextureGeneration : MonoBehaviour
     #region Material properties
     [SerializeField, SetProperty("textureWidth")]
     private int m_textureWidth = 512;
-    public int textureWidth
+    public int TextureWidth
     {
         get
         {
@@ -24,7 +24,7 @@ public class ProceduralTextureGeneration : MonoBehaviour
 
     [SerializeField, SetProperty("backgroundColor")]
     private Color m_backgroundColor = Color.white;
-    public Color backgroundColor
+    public Color BackgroundColor
     {
         get
         {
@@ -39,7 +39,7 @@ public class ProceduralTextureGeneration : MonoBehaviour
 
     [SerializeField, SetProperty("circleColor")]
     private Color m_circleColor = Color.yellow;
-    public Color circleColor
+    public Color CircleColor
     {
         get
         {
@@ -54,7 +54,7 @@ public class ProceduralTextureGeneration : MonoBehaviour
 
     [SerializeField, SetProperty("blurFactor")]
     private float m_blurFactor = 2.0f;
-    public float blurFactor
+    public float BlurFactor
     {
         get
         {
@@ -95,21 +95,21 @@ public class ProceduralTextureGeneration : MonoBehaviour
 
     private Texture2D _GenerateProceduralTexture()
     {
-        Texture2D proceduralTexture = new Texture2D(textureWidth, textureWidth);
+        Texture2D proceduralTexture = new Texture2D(TextureWidth, TextureWidth);
 
         // The interval between circles
-        float circleInterval = textureWidth / 4.0f;
+        float circleInterval = TextureWidth / 4.0f;
         // The radius of circles
-        float radius = textureWidth / 10.0f;
+        float radius = TextureWidth / 10.0f;
         // The blur factor
-        float edgeBlur = 1.0f / blurFactor;
+        float edgeBlur = 1.0f / BlurFactor;
 
-        for (int w = 0; w < textureWidth; w++)
+        for (int w = 0; w < TextureWidth; w++)
         {
-            for (int h = 0; h < textureWidth; h++)
+            for (int h = 0; h < TextureWidth; h++)
             {
                 // Initalize the pixel with background color
-                Color pixel = backgroundColor;
+                Color pixel = BackgroundColor;
 
                 // Draw nine circles one by one
                 for (int i = 0; i < 3; i++)
@@ -123,7 +123,7 @@ public class ProceduralTextureGeneration : MonoBehaviour
                         float dist = Vector2.Distance(new Vector2(w, h), circleCenter) - radius;
 
                         // Blur the edge of the circle
-                        Color color = _MixColor(circleColor, new Color(pixel.r, pixel.g, pixel.b, 0.0f), Mathf.SmoothStep(0f, 1.0f, dist * edgeBlur));
+                        Color color = _MixColor(CircleColor, new Color(pixel.r, pixel.g, pixel.b, 0.0f), Mathf.SmoothStep(0f, 1.0f, dist * edgeBlur));
 
                         // Mix the current color with the previous color
                         pixel = _MixColor(pixel, color, color.a);

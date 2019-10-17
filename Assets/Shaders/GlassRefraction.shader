@@ -78,7 +78,9 @@
 				float3 worldViewDir = normalize(UnityWorldSpaceViewDir(worldPos));
 
 				fixed3 bump = UnpackNormal(tex2D(_BumpMap, i.uv.zw));
-				//折射，对屏幕坐标进行偏移，在切线空间进行。
+				//折射发生在顶点局部坐标系里，在切线空间进行。
+				//顶点法线就是z轴，因此偏移量应该在xy平面上，因此使用bump.xy对scrPos进行偏移，见乐乐github
+				//scrPos的意义见92页
 				float2 offset = bump.xy * _Distortion * _RefractionTex_TexelSize;
 				i.scrPos.xy += offset;
 				fixed3 refractCol = tex2D(_RefractionTex, i.scrPos.xy / i.scrPos.w).rgb;
