@@ -88,6 +88,8 @@ public class FreeCamera : MonoBehaviour
 
         m_yaw = (m_yaw + lookSpeed * rotStrafe) % 360f;
         m_pitch = (m_pitch - lookSpeed * rotFwd) % 360f;
+        if (m_pitch > 90f) m_pitch = 90f;
+        if (m_pitch < -90f) m_pitch = -90f;
         transform.rotation = Quaternion.AngleAxis(m_yaw, Vector3.up) * Quaternion.AngleAxis(m_pitch, Vector3.right);
 
         var speed = Time.deltaTime * (Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : moveSpeed);

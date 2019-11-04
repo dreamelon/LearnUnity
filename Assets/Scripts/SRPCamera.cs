@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class SRPCamera : MonoBehaviour
 {
-    public RenderTexture cameraRT;
+    private RenderTexture cameraRT;
 
     private static int _DepthTexture = Shader.PropertyToID("_DepthTexture");
     private RenderTexture[] GBufferTextures;
@@ -51,13 +51,14 @@ public class SRPCamera : MonoBehaviour
         Camera cam = Camera.current;
         Shader.SetGlobalTexture(_DepthTexture, depthTexture);
         Graphics.SetRenderTarget(GBuffers, depthTexture.depthBuffer);
+        Graphics.SetRenderTarget(cameraRT);
         GL.Clear(true, true, Color.grey);
         //start dc
         pureColorMaterial.color = new Color(0, 0.5f, 0.8f);
         pureColorMaterial.SetPass(0);
         foreach (var i in cubeTrans)
         {
-            Graphics.DrawMeshNow(cubeMesh, i.localToWorldMatrix);
+            Graphics.DrawMeshNow(cubeMesh, Matrix4x4.identity);
         }
 
         skybox.DrawSkybox(cam, cameraRT);

@@ -40,8 +40,6 @@
                 return o;
             }
 
-
-
             fixed4 frag (v2f i) : COLOR
             {
 				float3 viewDir = normalize(i.worldPos - _WorldSpaceCameraPos);
