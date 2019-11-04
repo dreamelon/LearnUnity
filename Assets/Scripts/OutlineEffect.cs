@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 //非运行时也有效果
-[ExecuteInEditMode]
+[ExecuteInEditMode]//添加脚本、启动、Stop的时候执行Awake()  Start()
 public class OutlineEffect : MonoBehaviour
 {
     public Camera outlineCamera;
