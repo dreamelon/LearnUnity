@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class BrightnessSaturationAndContrast : PostProcess
 {
-    [Range(0.0f, 3.0f)]
+    [Range(0.0f, 3.0f)]//亮度
     public float brightness = 1.0f;
-    [Range(0.0f, 3.0f)]
+    [Range(0.0f, 3.0f)]//饱和度
     public float saturation = 1.0f;
-    [Range(0.0f, 3.0f)]
+    [Range(0.0f, 3.0f)]//对比度
     public float contrast = 1.0f;
 
     private void OnRenderImage(RenderTexture source, RenderTexture destination)
