@@ -56,14 +56,41 @@
                 return o;
             }
 
-            fixed4 frag (v2f i) : SV_Target
-            {
-                // sample the texture
-                fixed4 col = tex2D(_MainTex, i.uv);
-                // apply fog
-                UNITY_APPLY_FOG(i.fogCoord, col);
-                return col;
+			fixed luminance(fixed4 color) {
+				return 0.2125 * color.r + 0.7154 * color.g + 0.0721 * color.b;
+			}
+
+			half Sobel(v2f i) {
+				const half Gx[9] = {
+					-1,0,1,
+					-2,0,2,
+					-1,0,1
+
+				};
+				const half Gy[9] = {
+					-1, -2, -1,
+						0,  0,  0,
+						1,  2,  1 };
+				half texColor;
+				half edgeX = 0;
+				half edgeY = 0;
+				for (int it = 0; it < 9; it++) {
+					texColor = luminance(tex2D(_MainTex, i.uv[it]));
+					edgeX += texColor * Gx[it];
+					edgeY += texColor * Gy[it];
+				}
+				return 1 - abs(edgeX) - abs(edgeY);
+			}
+			fixed4 frag(v2f i) : SV_Target
+			{
+				half edge = Sobel(i);
+				fixed4 color = tex2D(_MainTex, i.uv[4]);
+				fixed4 withEdgeColor = lerp(_EdgeColor, color, edge);
+				fixed4 onlyEdgeColor = lerp(_EdgeColor, _BackgroundColor, edge);
+				return lerp(withEdgeColor, onlyEdgeColor, _EdgeOnly);
             }
+
+
             ENDCG
         }
     }
