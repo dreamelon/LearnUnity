@@ -68,7 +68,7 @@
 
 				};
 				const half Gy[9] = {
-					-1, -2, -1,
+					- 1, -2, -1,
 						0,  0,  0,
 						1,  2,  1 };
 				half texColor;
@@ -79,14 +79,16 @@
 					edgeX += texColor * Gx[it];
 					edgeY += texColor * Gy[it];
 				}
-				return 1 - abs(edgeX) - abs(edgeY);
+				//return 1 - abs(edgeY) - abs(edgeX) 应当调换color,_EdgeColor顺序
+				return abs(edgeY) + abs(edgeX);
+
 			}
 			fixed4 frag(v2f i) : SV_Target
 			{
 				half edge = Sobel(i);
 				fixed4 color = tex2D(_MainTex, i.uv[4]);
-				fixed4 withEdgeColor = lerp(_EdgeColor, color, edge);
-				fixed4 onlyEdgeColor = lerp(_EdgeColor, _BackgroundColor, edge);
+				fixed4 withEdgeColor = lerp(color, _EdgeColor, edge);
+				fixed4 onlyEdgeColor = lerp(_BackgroundColor, _EdgeColor, edge);
 				return lerp(withEdgeColor, onlyEdgeColor, _EdgeOnly);
             }
 
