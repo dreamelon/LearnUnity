@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DeferredLighting : MonoBehaviour
+[System.Serializable]
+public class DeferredLighting
 {
     public Material deferredMaterial;
     public Light directionLight;

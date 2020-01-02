@@ -124,6 +124,7 @@ GameObject:
   - component: {fileID: 282333268}
   - component: {fileID: 282333267}
   - component: {fileID: 282333266}
+  - component: {fileID: 282333270}
   m_Layer: 0
   m_Name: Cube (2)
   m_TagString: Untagged
@@ -203,6 +204,20 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &282333270
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 282333265}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b02bd08419f96b4187cc5b1fd567d1d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetMesh: {fileID: 0}
+  targetMaterial: {fileID: 0}
 --- !u!1 &638946130
 GameObject:
   m_ObjectHideFlags: 0
@@ -270,7 +285,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
 --- !u!1 &962280052
 GameObject:
@@ -284,6 +299,7 @@ GameObject:
   - component: {fileID: 962280055}
   - component: {fileID: 962280054}
   - component: {fileID: 962280053}
+  - component: {fileID: 962280057}
   m_Layer: 0
   m_Name: Cube (3)
   m_TagString: Untagged
@@ -363,6 +379,20 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &962280057
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 962280052}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b02bd08419f96b4187cc5b1fd567d1d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetMesh: {fileID: 0}
+  targetMaterial: {fileID: 0}
 --- !u!1 &1415381005
 GameObject:
   m_ObjectHideFlags: 0
@@ -462,7 +492,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1415381005}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5b02bd08419f96b4187cc5b1fd567d1d, type: 3}
   m_Name: 
@@ -551,7 +581,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1578985036
 MonoBehaviour:
@@ -574,7 +604,9 @@ MonoBehaviour:
   skybox:
     skyboxMaterial: {fileID: 2100000, guid: 4fef1e39e5ed7d646a55139f5f698acc, type: 2}
   depthTexture: {fileID: 0}
-  lighting: {fileID: 0}
+  lighting:
+    deferredMaterial: {fileID: 2100000, guid: fa3ee0cebccab3f4fae5ccd22eae45d2, type: 2}
+    directionLight: {fileID: 638946131}
 --- !u!114 &1578985037
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -588,7 +620,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enableInputCapture: 1
-  holdRightMouseCapture: 0
+  holdRightMouseCapture: 1
   lookSpeed: 5
   moveSpeed: 5
   sprintSpeed: 50

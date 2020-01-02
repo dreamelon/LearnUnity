@@ -16,8 +16,8 @@ public class SRPCamera : MonoBehaviour
     public Mesh cubeMesh;
     public Material pureColorMaterial;
     public SkyBoxDraw skybox;
-    //public DeferredLighting lighting;
-    public RenderTexture depthTexture;
+
+    private RenderTexture depthTexture;
 
     public DeferredLighting lighting;
 
