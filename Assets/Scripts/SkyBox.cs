@@ -36,7 +36,7 @@ public struct SkyBoxDraw
             return m_mesh;
         }
     }
-    public void DrawSkybox(Camera cam, RenderTexture cameraTarget)
+    public void DrawSkybox(Camera cam, RenderBuffer cameraTarget, RenderBuffer depth)
     {
         corners[0] = cam.ViewportToWorldPoint(new Vector3(0, 0, cam.farClipPlane));//视口坐标转换为世界坐标
         corners[1] = cam.ViewportToWorldPoint(new Vector3(1, 0, cam.farClipPlane));
@@ -44,7 +44,7 @@ public struct SkyBoxDraw
         corners[3] = cam.ViewportToWorldPoint(new Vector3(1, 1, cam.farClipPlane));
         skyboxMaterial.SetVectorArray(_Corner, corners);
         skyboxMaterial.SetPass(0);
-        Graphics.SetRenderTarget(cameraTarget);
+        Graphics.SetRenderTarget(cameraTarget, depth);
         //绘制屏幕四边形
         Graphics.DrawMeshNow(fullScreenMsh, Matrix4x4.identity);
     }

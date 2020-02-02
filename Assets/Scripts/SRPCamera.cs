@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+delegate int functionPointer();
+
 public class SRPCamera : MonoBehaviour
 {
     private RenderTexture cameraRT;
-
+    
     private static int _DepthTexture = Shader.PropertyToID("_DepthTexture");
     private RenderTexture[] GBufferTextures;
     private RenderBuffer[] GBuffers;
@@ -14,7 +16,7 @@ public class SRPCamera : MonoBehaviour
 
     public Transform[] cubeTrans;
     public Mesh cubeMesh;
-    public Material pureColorMaterial;
+    public Material DeferredMaterial;
     public SkyBoxDraw skybox;
 
     private RenderTexture depthTexture;
@@ -58,16 +60,16 @@ public class SRPCamera : MonoBehaviour
         //Graphics.SetRenderTarget(cameraRT);
         GL.Clear(true, true, Color.grey);
         //start dc
-        pureColorMaterial.color = new Color(0, 0.2f, 0.8f);
-        pureColorMaterial.SetPass(0);
+        DeferredMaterial.color = new Color(0, 0.2f, 0.8f);
+        DeferredMaterial.SetPass(0);
         foreach (var i in cubeTrans)
         {
             Graphics.DrawMeshNow(cubeMesh, i.localToWorldMatrix);
         }
 
         lighting.DrawLight(GBufferTextures, GBufferIDs, cameraRT, cam);
-
-        skybox.DrawSkybox(cam, cameraRT);
+        //Graphics.Blit(GBufferTextures[1], cameraRT);
+        skybox.DrawSkybox(cam, cameraRT.colorBuffer, depthTexture.depthBuffer);
         //end dc
         Graphics.Blit(cameraRT, cam.targetTexture);
     }

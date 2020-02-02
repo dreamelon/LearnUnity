@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class RenderObject : MonoBehaviour
 {
-    public Mesh targetMesh;
+    //public Mesh targetMesh;
     public Material targetMaterial;
 
     [System.NonSerialized]

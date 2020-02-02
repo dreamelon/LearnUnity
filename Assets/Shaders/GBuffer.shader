@@ -51,10 +51,10 @@
 			FragmentOutput frag (v2f i) 
 			{
 				FragmentOutput output;
-				output.gBuffer0 = i.worldPos;
-				output.gBuffer1 = float4(normalize(i.worldNormal) * 0.5 + 0.5, 1.0);
-				output.gBuffer2 = float4(0.8, 0, 0, 1);
-				output.gBuffer3 = float4(0, 0, 0, 1);  
+				output.gBuffer0 = float4(0, 0.8, 0, 0.5);//diffuseColor + occlusion
+				output.gBuffer1 = float4(0.8, 0, 0, 1);//specularColor + smoothness
+				output.gBuffer2 = float4(normalize(i.worldNormal) * 0.5 + 0.5, 1.0);//normal				
+				output.gBuffer3 = float4(0, 0, 0.8, 1); //Emission 
 				return output;
             }
             ENDCG

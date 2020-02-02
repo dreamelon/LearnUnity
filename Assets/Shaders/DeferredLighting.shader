@@ -1,9 +1,8 @@
-﻿Shader "Custom/DeferredLighting"
+﻿Shader "Hidden/DeferredLighting"
 {
     SubShader
     {
-        Tags { "RenderType"="Opaque" }
-        LOD 100
+
 		Cull Off
 		ZWrite Off
 		ZTest Always
@@ -13,7 +12,7 @@
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
-
+			#pragma target 5.0
             #include "UnityCG.cginc"
 			#include "UnityPBSLighting.cginc"
 			#include "UnityDeferredLibrary.cginc"
@@ -70,7 +69,7 @@
 
 				UnityStandardData data = UnityStandardDataFromGbuffer(gbuffer0, gbuffer1, gbuffer2);
 
-				float3 viewDir = normalize(worldPos.xyz - _WorldSpaceCameraPos);
+				float3 viewDir = normalize(_WorldSpaceCameraPos - worldPos.xyz);
 				float oneMinusReflectivity = 1 - SpecularStrength(data.specularColor.rgb);
 				UnityIndirect ind;
 				UNITY_INITIALIZE_OUTPUT(UnityIndirect, ind);
