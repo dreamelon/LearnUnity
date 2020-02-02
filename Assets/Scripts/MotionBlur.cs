@@ -15,7 +15,7 @@ public class MotionBlur : PostProcess
 
     private void OnDisable()
     {
-        Destroy(accumulationTexture);
+        DestroyImmediate(accumulationTexture);
     }
 
     private void OnRenderImage(RenderTexture source, RenderTexture destination)
