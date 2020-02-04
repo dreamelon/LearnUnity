@@ -216,6 +216,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b02bd08419f96b4187cc5b1fd567d1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  targetMesh: {fileID: 0}
   targetMaterial: {fileID: 2100000, guid: 1be7366be59443444918854c516fc408, type: 2}
 --- !u!1 &602710745
 GameObject:
@@ -481,6 +482,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b02bd08419f96b4187cc5b1fd567d1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  targetMesh: {fileID: 0}
   targetMaterial: {fileID: 2100000, guid: 1be7366be59443444918854c516fc408, type: 2}
 --- !u!1 &1415381005
 GameObject:
@@ -586,6 +588,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b02bd08419f96b4187cc5b1fd567d1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  targetMesh: {fileID: 0}
   targetMaterial: {fileID: 2100000, guid: 1be7366be59443444918854c516fc408, type: 2}
 --- !u!1 &1578985032
 GameObject:
@@ -689,11 +692,13 @@ MonoBehaviour:
   - {fileID: 962280056}
   cubeMesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
   DeferredMaterial: {fileID: 2100000, guid: 1be7366be59443444918854c516fc408, type: 2}
-  skybox:
-    skyboxMaterial: {fileID: 2100000, guid: 4fef1e39e5ed7d646a55139f5f698acc, type: 2}
+  renderObjects: []
   lighting:
     deferredMaterial: {fileID: 2100000, guid: fa3ee0cebccab3f4fae5ccd22eae45d2, type: 2}
     directionLight: {fileID: 638946131}
+  superSample: 1
+  skybox:
+    skyboxMaterial: {fileID: 2100000, guid: 4fef1e39e5ed7d646a55139f5f698acc, type: 2}
 --- !u!114 &1578985037
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -707,7 +712,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enableInputCapture: 1
-  holdRightMouseCapture: 1
+  holdRightMouseCapture: 0
   lookSpeed: 5
   moveSpeed: 5
   sprintSpeed: 50

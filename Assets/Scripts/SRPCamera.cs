@@ -1,27 +1,32 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using Unity.Jobs;
 delegate int functionPointer();
 
 public class SRPCamera : MonoBehaviour
 {
     private RenderTexture cameraRT;
-    
+
     private static int _DepthTexture = Shader.PropertyToID("_DepthTexture");
+    private static int _InvVP = Shader.PropertyToID("_InvVP");
+
     private RenderTexture[] GBufferTextures;
     private RenderBuffer[] GBuffers;
     private int[] GBufferIDs;
-    
+
 
     public Transform[] cubeTrans;
     public Mesh cubeMesh;
     public Material DeferredMaterial;
-    public SkyBoxDraw skybox;
-
     private RenderTexture depthTexture;
-
+    public RenderObject[] renderObjects;
     public DeferredLighting lighting;
+
+    [Range(0.5f, 4f)]
+    public float superSample = 1;
+
+    public SkyBoxDraw skybox;
 
     // Start is called before the first frame update
     void Start()
@@ -37,7 +42,7 @@ public class SRPCamera : MonoBehaviour
         //深度贴图？
         depthTexture = new RenderTexture(Screen.width, Screen.height, 24, RenderTextureFormat.Depth, RenderTextureReadWrite.Linear);
         GBuffers = new RenderBuffer[GBufferTextures.Length];
-        for(int i = 0; i < GBuffers.Length; i++)
+        for (int i = 0; i < GBuffers.Length; i++)
         {
             GBuffers[i] = GBufferTextures[i].colorBuffer;
         }
@@ -49,12 +54,29 @@ public class SRPCamera : MonoBehaviour
             Shader.PropertyToID("_GBuffer2"),
             Shader.PropertyToID("_GBuffer3")
         };
+        SortMesh.InitSortMesh(renderObjects.Length);
+        CullMesh.renderObjects = renderObjects;
+        foreach (var i in renderObjects)
+        {
+            i.Init();
+        }
     }
 
     private void OnPostRender()
     {
         Camera cam = Camera.current;
         Shader.SetGlobalTexture(_DepthTexture, depthTexture);
+
+        //Matrix4x4 proj = GL.GetGPUProjectionMatrix(cam.projectionMatrix, false);
+        //Matrix4x4 vp = proj * cam.worldToCameraMatrix;
+        //Matrix4x4 inverseVp = vp.inverse;
+        //Shader.SetGlobalMatrix(_InvVP, inverseVp);
+        //CullMesh.UpdateFrame(cam, ref inverseVp, transform.position);
+        //SortMesh.UpdateFrame();
+        //JobHandle cullHandle = CullMesh.Schedule();
+        //JobHandle sortHandle = SortMesh.Schedule(cullHandle);
+        //JobHandle.ScheduleBatchedJobs();
+
         //渲染目标改为gbuffer
         Graphics.SetRenderTarget(GBuffers, depthTexture.depthBuffer);
         //Graphics.SetRenderTarget(cameraRT);
@@ -62,9 +84,14 @@ public class SRPCamera : MonoBehaviour
         //start dc
         DeferredMaterial.color = new Color(0, 0.2f, 0.8f);
         DeferredMaterial.SetPass(0);
-        foreach (var i in cubeTrans)
+        //sortHandle.Complete();
+        //for (int i = 0; i < SortMesh.sorts.Length; i++)
+        //{
+        //    DrawElements(ref SortMesh.sorts[i]);
+        //}
+        for(int i = 0; i < cubeTrans.Length; i++)
         {
-            Graphics.DrawMeshNow(cubeMesh, i.localToWorldMatrix);
+            Graphics.DrawMeshNow(cubeMesh, cubeTrans[i].localToWorldMatrix);
         }
 
         lighting.DrawLight(GBufferTextures, GBufferIDs, cameraRT, cam);
@@ -73,6 +100,15 @@ public class SRPCamera : MonoBehaviour
         //end dc
         Graphics.Blit(cameraRT, cam.targetTexture);
     }
-    
+
+    public void DrawElements(ref BinarySort<RenderObject> binarySort)
+    {
+        RenderObject[] objs = binarySort.meshes;
+        for (int j = 0; j < binarySort.count; j++)
+        {
+            Graphics.DrawMeshNow(objs[j].targetMesh, objs[j].localToWorldMatrix);
+        }
+
+    }
 }
 

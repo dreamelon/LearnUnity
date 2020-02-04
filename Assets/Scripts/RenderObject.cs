@@ -4,19 +4,17 @@ using UnityEngine;
 
 public class RenderObject : MonoBehaviour
 {
-    //public Mesh targetMesh;
+    public Mesh targetMesh;
     public Material targetMaterial;
 
     [System.NonSerialized]
     public Matrix4x4 localToWorldMatrix;
-
-    void Init()
+    [System.NonSerialized]
+    public Vector3 extent;
+    public void Init()
     {
         localToWorldMatrix = transform.localToWorldMatrix;
+        extent = targetMesh.bounds.extents;
     }
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+
 }
